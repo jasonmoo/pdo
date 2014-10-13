@@ -2,8 +2,8 @@ package pdo
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -12,6 +12,10 @@ type (
 		DBO
 	}
 )
+
+func NewMySQLFromDB(db *sql.DB) *MySQL {
+	return &MySQL{DBO{DB: db}}
+}
 
 func NewMySQL(dsn string) (*MySQL, error) {
 
@@ -27,7 +31,7 @@ func NewMySQL(dsn string) (*MySQL, error) {
 
 	err = m.DB.Ping()
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s (%s)\n", err, dsn))
+		return nil, fmt.Errorf("%s (%s)\n", err, dsn)
 	}
 
 	return m, nil

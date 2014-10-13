@@ -4,10 +4,10 @@ package pdo
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type (
@@ -15,6 +15,10 @@ type (
 		DBO
 	}
 )
+
+func NewSqliteFromDB(db *sql.DB) *Sqlite {
+	return &Sqlite{DBO{DB: db}}
+}
 
 func NewSqlite(dsn string) (*Sqlite, error) {
 
@@ -32,7 +36,7 @@ func NewSqlite(dsn string) (*Sqlite, error) {
 
 	err = s.DB.Ping()
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("%s (%s)\n", err, dsn))
+		return nil, fmt.Errorf("%s (%s)\n", err, dsn)
 	}
 
 	return s, nil
