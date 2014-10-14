@@ -570,7 +570,7 @@ func EnsureMySQL() {
 		return
 	}
 
-	database, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/pdo_test")
+	database, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/mysql")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -578,7 +578,7 @@ func EnsureMySQL() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = database.Exec("DROP TABLE IF EXISTS `test_table`")
+	_, err = database.Exec("DROP TABLE IF EXISTS `pdo_test`.`test_table`")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -587,7 +587,10 @@ func EnsureMySQL() {
 		log.Fatal(err)
 	}
 
-	database.Exec("INSERT INTO `test_table` (`first_name`,`last_name`) VALUES (\"user1\",\"johnson\"),(\"user2\",\"johnson\")")
+	_, err = database.Exec("INSERT INTO `pdo_test`.`test_table` (`first_name`,`last_name`) VALUES (\"user1\",\"johnson\"),(\"user2\",\"johnson\")")
+	if err != nil {
+		log.Fatal(err)
+	}
 	database.Close()
 	// done building, continue with the tests
 
