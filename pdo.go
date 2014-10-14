@@ -3,6 +3,7 @@ package pdo
 import (
 	"bytes"
 	stdlib_sql "database/sql"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -15,7 +16,8 @@ type (
 )
 
 var (
-	EmptySkipList = []string{}
+	EmptySkipList        = []string{}
+	NoColumnsTaggedError = errors.New("No columns tagged on this struct.")
 )
 
 func (d *DBO) Create(record_ptr interface{}) (int64, error) {
@@ -44,6 +46,10 @@ func (d *DBO) Create(record_ptr interface{}) (int64, error) {
 	sql.WriteString(") VALUES (")
 
 	values := FieldPointers(record_ptr, []string{"id"})
+
+	if len(values) == 0 {
+		return 0, NoColumnsTaggedError
+	}
 
 	for i := 0; i < len(values); i++ {
 		sql.WriteString("?,")
@@ -87,7 +93,12 @@ func (d *DBO) Update(record_ptr interface{}) error {
 	sql.WriteString(Table(record_ptr))
 	sql.WriteString("` SET ")
 
-	for _, col := range Columns(record_ptr, []string{"id"}) {
+	columns := Columns(record_ptr, []string{"id"})
+	if len(columns) == 0 {
+		return NoColumnsTaggedError
+	}
+
+	for _, col := range columns {
 		sql.WriteString("`")
 		sql.WriteString(col)
 		sql.WriteString("` = ?,")
@@ -158,11 +169,16 @@ func (d *DBO) Find(record_ptr interface{}, where string, params ...interface{}) 
 		panic("only *Struct value allowed")
 	}
 
+	columns := Columns(record_ptr, EmptySkipList)
+	if len(columns) == 0 {
+		return NoColumnsTaggedError
+	}
+
 	var sql bytes.Buffer
 
 	sql.WriteString("SELECT ")
 
-	for _, col := range Columns(record_ptr, EmptySkipList) {
+	for _, col := range columns {
 		sql.WriteString("`")
 		sql.WriteString(col)
 		sql.WriteString("`,")

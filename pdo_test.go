@@ -27,6 +27,10 @@ var (
 	Sqlitebuilt = false
 )
 
+func init() {
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
+}
+
 func BenchmarkTable(b *testing.B) {
 
 	user := new(TestUser)
