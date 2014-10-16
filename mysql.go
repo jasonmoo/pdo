@@ -13,27 +13,21 @@ type (
 	}
 )
 
-func NewMySQLFromDB(db *sql.DB) *MySQL {
+func NewMysql(db *sql.DB) *MySQL {
 	return &MySQL{DBO{DB: db}}
 }
 
-func NewMySQL(dsn string) (*MySQL, error) {
+func NewMySQLFromDSN(dsn string) (*MySQL, error) {
 
-	var (
-		m   = new(MySQL)
-		err error
-	)
-
-	m.DB, err = sql.Open("mysql", dsn)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.DB.Ping()
-	if err != nil {
+	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("%s (%s)\n", err, dsn)
 	}
 
-	return m, nil
+	return NewMysql(db), nil
 
 }

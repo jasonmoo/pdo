@@ -16,29 +16,26 @@ type (
 	}
 )
 
-func NewSqliteFromDB(db *sql.DB) *Sqlite {
+func NewSqlite(db *sql.DB) *Sqlite {
 	return &Sqlite{DBO{DB: db}}
 }
 
-func NewSqlite(dsn string) (*Sqlite, error) {
+func NewSqliteFromDSN(dsn string) (*Sqlite, error) {
 
 	_, err := os.Stat(dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	s := new(Sqlite)
-
-	s.DB, err = sql.Open("sqlite3", dsn)
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.DB.Ping()
-	if err != nil {
+	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("%s (%s)\n", err, dsn)
 	}
 
-	return s, nil
+	return NewSqlite(db), nil
 
 }

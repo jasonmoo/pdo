@@ -594,7 +594,7 @@ func EnsureMySQL() {
 	database.Close()
 	// done building, continue with the tests
 
-	mysqldb, err = NewMySQL("root:password@tcp(127.0.0.1:3306)/pdo_test")
+	mysqldb, err = NewMySQLFromDSN("root:password@tcp(127.0.0.1:3306)/pdo_test")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -625,7 +625,7 @@ func EnsureSqlite() {
 	database.Exec(`INSERT INTO "test_table" ("first_name","last_name") VALUES ("user1","johnson"),("user2","johnson")`)
 	database.Close()
 
-	sqlitedb, err = NewSqlite("test.db")
+	sqlitedb, err = NewSqliteFromDSN("test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
